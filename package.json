@@ -1,0 +1,50 @@
+{
+  "name": "shadow-novel-express-server",
+  "version": "1.0.0",
+  "description": "A Shadow Novel Express Server",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "clean": "rm -r -f dist",
+    "build": "tsc",
+    "server": "ts-node src/index",
+    "server:watch": "nodemon",
+    "start": "npm run build && node dist/index"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/leanderpaul/shadow-novel-express-server.git"
+  },
+  "author": "Shadow Lord",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/leanderpaul/shadow-novel-express-server/issues"
+  },
+  "homepage": "https://github.com/leanderpaul/shadow-novel-express-server#readme",
+  "devDependencies": {
+    "@types/express": "^4.17.9",
+    "@types/jsonwebtoken": "^8.5.0",
+    "ts-node": "^9.1.1",
+    "typescript": "^4.1.3"
+  },
+  "dependencies": {
+    "@leanderpaul/shadow-novel-database": "0.0.7",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "winston": "^3.3.3"
+  },
+  "nodemonConfig": {
+    "ignore": [
+      "**/*.test.ts",
+      "**/*.spec.ts",
+      ".git",
+      "node_modules"
+    ],
+    "watch": [
+      "src"
+    ],
+    "exec": "npm run server",
+    "ext": "ts"
+  }
+}
