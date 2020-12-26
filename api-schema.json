@@ -1,0 +1,608 @@
+{
+  "openapi": "3.0.2",
+  "info": {
+    "title": "Shadow Novel API",
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.server.test/v1"
+    }
+  ],
+  "paths": {
+    "/novels": {
+      "get": {
+        "operationId": "listNovels",
+        "summary": "List novels",
+        "parameters": [
+          {
+            "name": "title",
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "author",
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "genre",
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["ongoing", "completed"]
+            }
+          },
+          {
+            "name": "sortField",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["title"]
+            }
+          },
+          {
+            "name": "sortOrder",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["asc", "desc"]
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": { "type": "integer" }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of novels",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["pagination", "novels"],
+                  "properties": {
+                    "pagination": { "$ref": "#/components/schemas/Pagination" },
+                    "novels": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/NovelInfo" }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/ErrorResponse"
+          }
+        }
+      },
+      "post": {
+        "operationId": "createNovel",
+        "summary": "Create a new novel",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "format": "JWT token"
+            }
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/NovelInput"
+        },
+        "responses": {
+          "201": {
+            "description": "The Details of the created novel",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NovelDetails"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/ErrorResponse"
+          }
+        }
+      }
+    },
+    "/novels/{nid}": {
+      "get": {
+        "operationId": "getNovel",
+        "summary": "Retrieves the novel details",
+        "parameters": [
+          {
+            "name": "nid",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The novel details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NovelDetails"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/ErrorResponse"
+          }
+        }
+      },
+      "put": {
+        "operationId": "updateNovel",
+        "summary": "Updates the novel details",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/NovelInput"
+        },
+        "responses": {
+          "200": {
+            "description": "The updated novel details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NovelDetails"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/ErrorResponse"
+          }
+        }
+      }
+    },
+    "/novels/{nid}/volumes": {
+      "post": {
+        "summary": "Creates a new volume in the novel",
+        "requestBody": {
+          "content": {
+            "name": {
+              "schema": { "type": "string" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created volume details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["vid", "name"],
+                  "properties": {
+                    "vid": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/ErrorResponse"
+          }
+        }
+      }
+    },
+    "/novels/{nid}/volumes/{vid}": {
+      "put": {
+        "summary": "Updates the volume name",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "name": {
+              "schema": { "type": "string" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated volume details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["vid", "name"],
+                  "properties": {
+                    "vid": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/ErrorResponse"
+          }
+        }
+      }
+    },
+    "/novels/{nid}/chapters": {
+      "get": {
+        "operationId": "getChapters",
+        "summary": "Get Chapter Details",
+        "parameters": [
+          {
+            "name": "sortOrder",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["asc", "desc"]
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": { "type": "integer" }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List chapter details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["pagination", "chapters"],
+                  "properties": {
+                    "pagination": {
+                      "$ref": "#/components/schemas/Pagination"
+                    },
+                    "chapters": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/NovelChapterDetails"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/ErrorResponse"
+          }
+        }
+      },
+      "post": {
+        "summary": "Add a new chapter to the novel",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/ChapterInput"
+        },
+        "responses": {
+          "201": {
+            "description": "The created chapter details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NovelChapterDetails"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/ErrorResponse"
+          }
+        }
+      }
+    },
+    "/novels/{nid}/chapters/{cid}": {
+      "get": {
+        "summary": "Retrives the chapter details",
+        "responses": {
+          "200": {
+            "description": "Chapter details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NovelChapterDetails"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/ErrorResponse"
+          }
+        }
+      },
+      "put": {
+        "summary": "Updates the chapter details",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/ChapterInput"
+        },
+        "responses": {
+          "200": {
+            "description": "Updated chapter details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NovelChapterDetails"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/ErrorResponse"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "responses": {
+      "ErrorResponse": {
+        "description": "The Error response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": ["code", "msg"],
+              "properties": {
+                "code": {
+                  "type": "string"
+                },
+                "msg": {
+                  "type": "string"
+                },
+                "err": {
+                  "type": "object",
+                  "description": "The Error object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "requestBodies": {
+      "NovelInput": {
+        "description": "The novel details",
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": ["title", "genre", "desc", "status", "tags"],
+              "properties": {
+                "title": {
+                  "type": "string"
+                },
+                "cover": {
+                  "type": "string"
+                },
+                "genre": {
+                  "type": "string"
+                },
+                "desc": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": ["ongoing", "completed"]
+                },
+                "tags": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "ChapterInput": {
+        "description": "The novel chapter details",
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": ["vid", "title", "content", "matureContent"],
+              "properties": {
+                "vid": {
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "content": {
+                  "type": "string"
+                },
+                "matureContent": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "NovelInfo": {
+        "type": "object",
+        "required": ["nid", "title", "genre", "desc", "status"],
+        "properties": {
+          "nid": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "cover": {
+            "type": "string"
+          },
+          "genre": {
+            "type": "string"
+          },
+          "desc": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["ongoing", "completed"]
+          }
+        }
+      },
+      "NovelDetails": {
+        "type": "object",
+        "required": ["nid", "title", "author", "genre", "desc", "status", "tags", "volumes", "views", "chapterCount", "createdAt"],
+        "properties": {
+          "nid": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "author": {
+            "type": "string"
+          },
+          "cover": {
+            "type": "string"
+          },
+          "genre": {
+            "type": "string"
+          },
+          "desc": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["ongoing", "completed"]
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "volumes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NovelVolume"
+            }
+          },
+          "views": {
+            "type": "integer"
+          },
+          "chapterCount": {
+            "type": "integer"
+          },
+          "createdAt": {
+            "type": "integer",
+            "format": "Date"
+          }
+        }
+      },
+      "NovelVolume": {
+        "type": "object",
+        "required": ["vid", "chapters"],
+        "properties": {
+          "vid": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "chapters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NovelChapterInfo"
+            }
+          }
+        }
+      },
+      "NovelChapterInfo": {
+        "type": "object",
+        "required": ["cid", "index", "title", "createdAt"],
+        "properties": {
+          "cid": {
+            "type": "string"
+          },
+          "index": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "integer",
+            "format": "Date"
+          }
+        }
+      },
+      "NovelChapterDetails": {
+        "type": "object",
+        "required": ["cid", "index", "title", "content", "createdAt"],
+        "properties": {
+          "cid": {
+            "type": "string"
+          },
+          "index": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string",
+            "format": "text"
+          },
+          "createdAt": {
+            "type": "integer",
+            "format": "Date"
+          }
+        }
+      },
+      "Pagination": {
+        "type": "object",
+        "required": ["offset", "limit", "totalCount"],
+        "properties": {
+          "offset": {
+            "type": "integer"
+          },
+          "limit": {
+            "type": "integer"
+          },
+          "totalCount": {
+            "type": "integer"
+          }
+        }
+      }
+    }
+  }
+}
