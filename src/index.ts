@@ -2,16 +2,7 @@
  * Importing npm packages.
  */
 import dotenv from 'dotenv';
-
-/**
- * Importing user defined packages.
- */
-
-/**
- * Importing and defining types.
- */
-import { app } from './server';
-import { logger } from './utils/logger';
+import '@leanderpaul/shadow-novel-database';
 
 /**
  * Setting up and checking the server env.
@@ -25,9 +16,16 @@ if (!process.env.JWT_SECRET) throw new Error('Env: JWT Secret key required !');
 /**
  * Declaring the constants.
  */
-const port = process.env.PORT;
+const PORT = process.env.PORT;
+const NODE_ENV = process.env.NODE_ENV || 'development';
+const logger = global.getLogger('server:index');
+
+/**
+ * Importing the required packages.
+ */
+import { app } from './server';
 
 /**
  * Setting up the server listener.
  */
-app.listen(port, () => logger.info(`Server listening in port ${port}`));
+app.listen(PORT, () => logger.info(`${NODE_ENV} server started in port ${PORT}`));

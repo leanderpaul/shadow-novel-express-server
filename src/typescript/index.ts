@@ -1,3 +1,5 @@
+import type { ParamsDictionary } from 'express-serve-static-core';
+
 export interface ErrorResponse {
   code: string;
   msg: string;
@@ -8,9 +10,10 @@ export interface Pagination {
   offset: number;
   limit: number;
   totalCount: number;
+  sort: { [k: string]: number };
 }
 
-export interface NovelURLParams {
+export interface NovelURLParams extends ParamsDictionary {
   nid: string;
 }
 

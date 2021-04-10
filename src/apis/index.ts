@@ -10,15 +10,19 @@ import { Router } from 'express';
 /**
  * Importing and defining types.
  */
-import { loginUser, registerUser } from './auth.controller';
+import authRoutes from './auth/routes';
+import novelRoutes from './novel/routes';
+import novelChapterRoutes from './novel-chapter/routes';
 
 /**
  * Declaring the constants.
  */
 const router = Router();
 
-router.post('/auth/login', loginUser);
+router.use('/', authRoutes);
 
-router.post('/auth/register', registerUser);
+router.use('/', novelRoutes);
+
+router.use('/', novelChapterRoutes);
 
 export default router;

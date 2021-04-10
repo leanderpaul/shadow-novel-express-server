@@ -2,14 +2,9 @@ import type { NovelChapter } from '@leanderpaul/shadow-novel-database';
 
 import type { ErrorResponse, NovelURLParams, Pagination, NovelChapterURLParams } from '../../typescript/index';
 
-export type ChapterDetails = Pick<NovelChapter, 'cid' | 'index' | 'title' | 'content' | 'matureContent' | 'createdAt'>;
+export type ChapterDetails = Omit<NovelChapter, 'nid'>;
 
-export interface NovelChapterInput {
-  vid: string;
-  title: string;
-  content: string;
-  matureContent: string;
-}
+export type NovelChapterInput = Pick<NovelChapter, 'vid' | 'title' | 'content' | 'matureContent'>;
 
 export interface CreateChapter {
   url: NovelURLParams;
@@ -17,7 +12,14 @@ export interface CreateChapter {
   response: NovelChapter | ErrorResponse;
 }
 
-export interface GetChapters {
+export interface ListChapters {
+  url: NovelURLParams;
+  response: {
+    chapters: Pick<NovelChapter, 'cid' | 'index' | 'title' | 'createdAt'>[];
+  };
+}
+
+export interface DownloadChapters {
   url: NovelURLParams;
   query: {
     sortOrder?: string;
@@ -26,7 +28,7 @@ export interface GetChapters {
   };
   response: {
     pagination: Pagination;
-    chapters: ChapterDetails[];
+    items: ChapterDetails[];
   };
 }
 
