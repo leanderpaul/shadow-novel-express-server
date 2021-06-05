@@ -6,30 +6,35 @@ import { Router } from 'express';
 /**
  * Importing user defined packages.
  */
-import { authorize } from '../../services/iam';
+import { IAM } from '../../services/index';
 
 /**
  * Importing and defining types.
  */
-import { createNovel, createVolume, deleteVolume, getNovel, listNovels, updateNovel, updateVolume } from './controller';
+import novelChapterRoutes from '../novel-chapter/routes';
+import { createNovel, createVolume, deleteVolume, getLatestUpdates, getNovel, listNovels, updateNovel, updateVolume } from './controller';
 
 /**
  * Declaring the constants.
  */
 const router = Router();
 
-router.get('/novels', listNovels);
+router.get('/', IAM.secure(listNovels));
 
-router.post('/novels', authorize(), createNovel);
+router.post('/', IAM.secure(createNovel));
 
-router.get('/novels/:nid', getNovel);
+router.get('/latest-updates', IAM.secure(getLatestUpdates));
 
-router.put('/novels/:nid', authorize(true), updateNovel);
+router.get('/:nid', IAM.secure(getNovel));
 
-router.post('/novels/:nid/volumes', authorize(true), createVolume);
+router.put('/:nid', IAM.secure(updateNovel));
 
-router.put('/novels/:nid/volumes/:vid', authorize(true), updateVolume);
+router.post('/:nid/volumes', IAM.secure(createVolume));
 
-router.delete('/novels/:nid/volumes/:vid', authorize(true), deleteVolume);
+router.put('/:nid/volumes/:vid', IAM.secure(updateVolume));
+
+router.delete('/:nid/volumes/:vid', IAM.secure(deleteVolume));
+
+router.use('/:nid/chapters', novelChapterRoutes);
 
 export default router;

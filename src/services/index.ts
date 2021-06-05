@@ -1,4 +1,5 @@
 import { ServerErrors } from './errors';
-import { IAM, authorize } from './iam';
+import { IAM } from './iam';
+import { Scraper } from './scraper';
 
-export { IAM, ServerErrors, authorize };
+export { IAM, ServerErrors, Scraper };

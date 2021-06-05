@@ -12,17 +12,20 @@ import { Router } from 'express';
  */
 import authRoutes from './auth/routes';
 import novelRoutes from './novel/routes';
-import novelChapterRoutes from './novel-chapter/routes';
+import scraperRoutes from './scraper/routes';
+import profileRoutes from './profile/routes';
 
 /**
  * Declaring the constants.
  */
 const router = Router();
 
-router.use('/', authRoutes);
+router.use('/auth', authRoutes);
 
-router.use('/', novelRoutes);
+router.use('/novels', novelRoutes);
 
-router.use('/', novelChapterRoutes);
+router.use('/scrape', scraperRoutes);
+
+router.use('/profile', profileRoutes);
 
 export default router;

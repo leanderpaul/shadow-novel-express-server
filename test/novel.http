@@ -1,0 +1,77 @@
+@nid = 1071111181031209710253
+@vid = ldmsdf
+
+# @name createNovel
+POST {{hostname}}/novels
+Authorization: {{authToken}}
+Content-Type: application/json
+
+{
+  "title": "Pocket Hunting Dimension",
+  "type": "series",
+  "genre": "FANTASY",
+  "status": "ONGOING",
+  "tags": ["ACTION", "ADVENTURE", "COMEDY", "HAREM", "SCI_FI", "XUANHUAN", "MALE_PROTAGONIST"],
+  "origin": "TRANSLATED",
+  "desc": [
+    { "tag": "p", "text": "Lu Ze transmigrated to the interstellar era two thousand years later." },
+    {
+      "tag": "p",
+      "text": "The previous owner of this body had lovey-dovey parents and a cute little sister. Although his cultivation talent was ordinary, his life was fulfilling. It could be said to be a dream start. Lu Ze was very happy."
+    },
+    { "tag": "p", "text": "However, as soon as he slept, he came to a strange dimension." },
+    { "tag": "p", "text": "He almost got taken out trying to fight an one meter tall huge white rabbit. After making the arduous kill, Lu Ze found that things didn’t seem to be so simple." },
+    { "tag": "p", "text": "After killing prey in this dimension, he could get little orbs that could be used for cultivation." },
+    { "tag": "p", "text": "This was going to make him an eternal jungler." },
+    { "tag": "p", "text": "But he seemed to be able to hope for domination of the cosmos and invincibility?" }
+  ]
+}
+
+###
+
+# @name listNovels
+GET {{hostname}}/novels
+
+###
+
+# @name getNovel
+GET {{hostname}}/novels/{{nid}}
+
+###
+
+# @name updateNovel
+PUT  {{hostname}}/novels/{{nid}}
+Authorization: {{authToken}}
+Content-Type: application/json
+
+{
+  "genre": "ROMANCE"
+}
+
+###
+
+# @name createVolume
+POST {{hostname}}/novels/{{nid}}/volumes
+Authorization: {{authToken}}
+Content-Type: application/json
+
+{
+  "name": ""
+}
+
+###
+
+# @name updateVolume
+PUT {{hostname}}/novels/{{nid}}/volumes/{{vid}}
+Authorization: {{authToken}}
+Content-Type: application/json
+
+{
+  "name": ""
+}
+
+###
+
+# @name deleteVolume
+DELETE {{hostname}}/novels/{{nid}}/volumes/{{vid}}
+Authorization: {{authToken}}

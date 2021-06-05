@@ -1,0 +1,15 @@
+@nid = dsfsdf
+@cid = djksfks
+@vid = dfjhks
+@baseURL = {{hostname}}/novel/{{nid}}
+
+# @name createChapter
+POST {{baseURL}}/chapters
+Authorization: {{authToken}}
+Content-Type: application/json
+
+{
+  "title": "",
+  "content": [],
+  "matureContent": false
+}

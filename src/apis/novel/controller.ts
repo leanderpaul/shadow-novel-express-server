@@ -1,7 +1,7 @@
 /**
  * Importing npm packages.
  */
-import { chapterModel, novelModel, DBUtils } from '@leanderpaul/shadow-novel-database';
+import { chapterModel, novelModel, DBUtils, userModel } from '@leanderpaul/shadow-novel-database';
 import { removeKeys, trimObject } from '@leanderpaul/ts-utils';
 
 /**
@@ -16,7 +16,7 @@ import { handlePagination } from './utils';
 import type { FilterQuery } from 'mongoose';
 import type { Novel } from '@leanderpaul/shadow-novel-database';
 import type { Request, Response } from 'express-serve-static-core';
-import type { CreateNovel, CreateVolume, DeleteVolume, FindNovel, GetNovel, UpdateNovel, UpdateVolume } from './types';
+import type { CreateNovel, CreateVolume, DeleteVolume, ListNovels, GetNovel, UpdateNovel, UpdateVolume, LatestUpdatesAggregate, GetLatestUpdates } from './types';
 
 /**
  * Declaring the constants.
@@ -27,14 +27,15 @@ export async function createNovel(req: Request<any, any, CreateNovel['body']>, r
     const user = req.iam.getUser()!;
     const novelInput = removeKeys(body, ['type']);
     const volumes = body.type === 'book' ? [DBUtils.generateVolume()] : undefined;
-    const novel = await novelModel.create({ uid: user.uid, nid: DBUtils.generateUUID(), ...novelInput, volumes });
+    const desc = body.desc.map((para) => ({ ...para, text: DBUtils.formatText(para.text) }));
+    const novel = await novelModel.create({ uid: user.uid, nid: DBUtils.generateUUID(), ...novelInput, volumes, desc });
     return res.status(201).json(removeKeys(novel.toObject(), ['_id']));
   } catch (err) {
     return res.error(err);
   }
 }
 
-export async function listNovels(req: Request<any, any, any, FindNovel['query']>, res: Response<FindNovel['response']>) {
+export async function listNovels(req: Request<any, any, any, ListNovels['query']>, res: Response<ListNovels['response']>) {
   try {
     const reqQuery = req.query;
     const dbQuery: FilterQuery<Novel> = {};
@@ -56,11 +57,13 @@ export async function listNovels(req: Request<any, any, any, FindNovel['query']>
 export async function getNovel(req: Request<GetNovel['url']>, res: Response<GetNovel['response']>) {
   try {
     const { nid } = req.params;
+    const user = req.iam.getUser();
     const novel = await novelModel.findOne({ nid }).lean();
     if (!novel) throw ServerErrors.NOVEL_NOT_FOUND;
     const chapters = await chapterModel.find({ nid }, 'cid index title createdAt').sort({ index: 1 }).lean();
-    novelModel.updateOne({ nid }, { $inc: { views: 1 } });
-    return res.json({ ...novel, chapters });
+    const author = await userModel.findOne({ uid: novel.uid }, 'uid username').lean();
+    if (!user || user.uid != novel.uid) await novelModel.updateOne({ nid }, { $inc: { views: 1 } });
+    return res.json({ ...novel, chapters, author: author!.username });
   } catch (err) {
     return res.error(err);
   }
@@ -74,6 +77,29 @@ export async function updateNovel(req: Request<UpdateNovel['url'], any, UpdateNo
     if (result.n === 0) throw ServerErrors.NOVEL_NOT_FOUND;
     const novel = await novelModel.findOne({ nid }).lean();
     return res.json(novel!);
+  } catch (err) {
+    return res.error(err);
+  }
+}
+
+export async function getLatestUpdates(_req: Request, res: Response<GetLatestUpdates['response']>) {
+  try {
+    const chapters = await novelModel.aggregate<LatestUpdatesAggregate>([
+      { $sort: { lastUpdated: -1 } },
+      { $lookup: { from: 'users', localField: 'uid', foreignField: 'uid', as: 'author' } },
+      { $unwind: { path: '$author' } },
+      {
+        $lookup: {
+          from: 'chapters',
+          let: { nid: '$nid', index: '$chapterCount' },
+          pipeline: [{ $match: { $expr: { $and: [{ $eq: ['$nid', '$$nid'] }, { $eq: ['$index', '$$index'] }] } } }],
+          as: 'chapter'
+        }
+      },
+      { $unwind: { path: '$chapter' } },
+      { $project: { _id: 0, nid: 1, title: 1, genre: 1, author: { uid: 1, username: 1 }, chapter: { cid: 1, index: 1, title: 1, createdAt: 1 } } }
+    ]);
+    return res.json({ items: chapters });
   } catch (err) {
     return res.error(err);
   }

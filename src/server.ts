@@ -25,15 +25,15 @@ const MORGAN_FORMAT = ':method :url :status :req[content-length]B in :res[conten
 /**
  * Middlewares
  */
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 app.use(IAM.init());
+app.use(express.json({ limit: '10mb'}));
+app.use(express.urlencoded({ extended: true }));
 app.use(morgan(MORGAN_FORMAT, { stream: { write: (msg) => logger.http(msg.replace('\n', '')) } }) as any);
 
 /**
  * API Routes.
  */
-app.use('/', routes);
+app.use('/api', routes);
 app.get('/status', (_req, res) => res.json({ msg: 'Server working !' }));
 app.use('*', (_req, res) => res.error(ServerErrors.API_NOT_FOUND));
 app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => res.error(err));

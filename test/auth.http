@@ -1,0 +1,29 @@
+# @name register
+POST {{hostname}}/auth/register
+Content-Type: application/json
+
+{
+  "username": "{{username}}",
+  "password": "{{password}}"
+}
+
+###
+
+# @name login
+POST {{hostname}}/auth/login
+Content-Type: application/json
+
+{
+  "username": "{{username}}",
+  "password": "{{password}}"
+}
+
+###
+
+# @name verifySession
+POST {{hostname}}/auth/verify-session
+Content-Type: application/json
+
+{
+  "token": "{{authToken}}"
+}

@@ -10,15 +10,17 @@ import { Router } from 'express';
 /**
  * Importing and defining types.
  */
-import { loginUser, registerUser } from './controller';
+import { loginUser, registerUser, verifySession } from './controller';
 
 /**
  * Declaring the constants.
  */
 const router = Router();
 
-router.post('/auth/login', loginUser);
+router.post('/login', loginUser);
 
-router.post('/auth/register', registerUser);
+router.post('/register', registerUser);
+
+router.post('/verify-session', verifySession);
 
 export default router;

@@ -9,7 +9,7 @@ export type NovelChapterInput = Pick<NovelChapter, 'vid' | 'title' | 'content' |
 export interface CreateChapter {
   url: NovelURLParams;
   body: NovelChapterInput;
-  response: NovelChapter | ErrorResponse;
+  response: NovelChapter;
 }
 
 export interface ListChapters {
@@ -34,13 +34,13 @@ export interface DownloadChapters {
 
 export interface GetChapter {
   url: NovelChapterURLParams;
-  response: ChapterDetails | ErrorResponse;
+  response: ChapterDetails;
 }
 
 export interface UpdateChapter {
   url: NovelChapterURLParams;
   body: Omit<NovelChapterInput, 'vid'>;
-  response: ChapterDetails | ErrorResponse;
+  response: ChapterDetails;
 }
 
 export interface DeleteChapter {

@@ -6,7 +6,7 @@ import { Router } from 'express';
 /**
  * Importing user defined packages.
  */
-import { authorize } from '../../services/index';
+import { IAM } from '../../services/index';
 
 /**
  * Importing and defining types.
@@ -16,16 +16,16 @@ import { createChapter, deleteChapter, getChapter, updateChapter, listChapters }
 /**
  * Declaring the constants.
  */
-const router = Router();
+const router = Router({ mergeParams: true });
 
-router.post('/novels/:nid/chapters', authorize(true), createChapter);
+router.post('/', IAM.secure(createChapter));
 
-router.get('/novels/:nid/chapters', listChapters);
+router.get('/', IAM.secure(listChapters));
 
-router.get('/novels/:nid/chapters/:cid', getChapter);
+router.get('/:cid', IAM.secure(getChapter));
 
-router.put('/novels/:nid/chapters/:cid', authorize(true), updateChapter);
+router.put('/:cid', IAM.secure(updateChapter));
 
-router.delete('/novels/:nid/chapters/:cid', authorize(true), deleteChapter);
+router.delete('/:cid', IAM.secure(deleteChapter));
 
 export default router;

@@ -1,0 +1,18 @@
+@nid = 1071101111095412110952
+
+# @name scrapeNovel
+POST {{hostname}}/scrape/{{nid}}
+Authorization: {{authToken}}
+Content-Type: application/json
+
+{
+  "bookId": "14806770705680405",
+  "startURL": "https://boxnovel.com/novel/pocket-hunting-dimension-boxnovel/chapter-1",
+  "cookie": "_csrfToken=WOfq6k4JBZaqcjzfknfKnURExFdSZPiaO7Qod345; e1=%7B%22pid%22%3A%22bookstore%22%2C%22eid%22%3A%22qi_A_bookcover%22%7D; e2=%7B%22pid%22%3A%22bookstore%22%2C%22l1%22%3A%221%22%7D; __auc=8532b84a17536fed91f7d94b9eb; _ga=GA1.2.987654152.1602945473; para-comment-tip-show=1; __gads=ID=fe46c2924ff0d5d8-2210983b52c4004b:T=1603198375:S=ALNI_MZzbQ5hf7RHAWaXtZ7dTQppZRCv8Q; dontneedgoogleonetap=1; googleonetaplogin=1; __zlcmid=118ja2fnpxr1wDt; show_lib_tip=1; bookCitysex=1; tc=_color1; ts=18; ukey=uXxgAnFJbr5; uid=4281630572; webnovel_uuid=1620266844_826740770; alkts=1621353142"
+}
+
+###
+
+# @name getScrapeStatus
+GET {{hostname}}/scrape/{{nid}}
+Authorization: {{authToken}}

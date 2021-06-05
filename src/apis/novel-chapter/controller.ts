@@ -18,6 +18,8 @@ import type { NovelChapter, Novel } from '@leanderpaul/shadow-novel-database';
 import type { Request, Response } from 'express-serve-static-core';
 import type { CreateChapter, DeleteChapter, GetChapter, DownloadChapters, UpdateChapter, ListChapters } from './types';
 
+type NovelUpdate = { filter: FilterQuery<Novel>; update: UpdateQuery<Novel> };
+
 /**
  * Declaring the constants.
  */
@@ -29,7 +31,7 @@ export async function createChapter(req: Request<CreateChapter['url'], any, Crea
     const novel = req.iam.getNovel()!;
     const index = novel.chapterCount + 1;
     const newChapter: Omit<NovelChapter, 'createdAt'> = { nid, cid: DBUtils.generateUUID(), ...pickKeys(body, ['content', 'title', 'matureContent']), index };
-    const novelUpdate: { filter: FilterQuery<Novel>; update: UpdateQuery<Novel> } = { filter: { nid }, update: { $inc: { chapterCount: 1 } } };
+    const novelUpdate: NovelUpdate = { filter: { nid }, update: { $inc: { chapterCount: 1 }, $set: { lastUpdated: new Date() } } };
     if (novel.volumes) {
       /** Novel type = Book */
       const volume = novel.volumes.find((value) => value.vid === body.vid);
@@ -90,13 +92,13 @@ export async function deleteChapter(req: Request<DeleteChapter['url']>, res: Res
     const chapter = await chapterModel.findOne(params, 'nid cid vid index').lean();
     if (!chapter) throw ServerErrors.NOVEL_CHAPTER_NOT_FOUND;
     if (chapter.vid) {
-      novelUpdate.filter['volumes.vid'] = params.vid;
+      novelUpdate.filter['volumes.vid'] = chapter.vid;
       novelUpdate.update.$inc = { ...novelUpdate.update.$inc, 'volumes.$.chapterCount': -1 };
     }
     await chapterModel.deleteOne(params);
     if (chapter.index < novel.chapterCount) await chapterModel.updateMany({ nid: params.nid, index: { $gt: chapter.index } }, { $inc: { index: -1 } });
     await novelModel.updateOne(novelUpdate.filter, novelUpdate.update);
-    return res.status(204).send();
+    return res.status(204).json();
   } catch (err) {
     return res.error(err);
   }

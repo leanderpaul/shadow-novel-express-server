@@ -1,8 +1,13 @@
-import type { Novel, NovelChapter, Genres, Tags, NovelStatus, NovelVolume } from '@leanderpaul/shadow-novel-database';
+import type { Novel, NovelChapter, Genres, Tags, NovelStatus, NovelVolume, User } from '@leanderpaul/shadow-novel-database';
 
 import type { NovelURLParams, NovelVolumeURLParams, Pagination } from '../../typescript/index';
 
-export type NovelInput = Omit<Novel, 'nid' | 'createdAt' | 'uid' | 'volumes' | 'views' | 'chapterCount'>;
+export interface LatestUpdatesAggregate extends Pick<Novel, 'nid' | 'title' | 'genre'> {
+  author: Pick<User, 'uid' | 'username'>;
+  chapter: Pick<NovelChapter, 'cid' | 'index' | 'title' | 'createdAt'>;
+}
+
+export type NovelInput = Omit<Novel, 'nid' | 'createdAt' | 'uid' | 'volumes' | 'views' | 'chapterCount' | 'lastUpdated'>;
 
 export interface CreateNovel {
   body: NovelInput & {
@@ -11,7 +16,7 @@ export interface CreateNovel {
   response: Novel;
 }
 
-export interface FindNovel {
+export interface ListNovels {
   query: {
     title?: string;
     uid?: string;
@@ -31,13 +36,19 @@ export interface FindNovel {
 
 export interface GetNovel {
   url: NovelURLParams;
-  response: Novel & { chapters: Pick<NovelChapter, 'cid' | 'index' | 'title' | 'createdAt'>[] };
+  response: Omit<Novel, 'uid'> & { chapters: Pick<NovelChapter, 'cid' | 'index' | 'title' | 'createdAt'>[]; author: string };
 }
 
 export interface UpdateNovel {
   url: NovelURLParams;
   body: NovelInput;
   response: Novel;
+}
+
+export interface GetLatestUpdates {
+  response: {
+    items: LatestUpdatesAggregate[];
+  };
 }
 
 export interface CreateVolume {
